@@ -1,20 +1,25 @@
 import { component$, Resource, useResource$ } from '@builder.io/qwik';
-import { RequestEvent, useLocation } from '@builder.io/qwik-city';
+import { RequestEvent, useEndpoint, useLocation } from '@builder.io/qwik-city';
 import { Comment } from '../../../components/comment/comment';
 import { getStory } from '../../../api';
 import type { IStory } from "../../../types";
 
+export const onGet = async (event: RequestEvent) => {
+    if (!event.params.id) {
+        throw event.response.redirect('/');
+    }
+    const storyId = Number(event.params.id)
+    const story = await getStory(storyId) as IStory;
+    return story
+}
+
 export default component$(
     () => {
-        const location = useLocation();
-        const resource = useResource$<IStory>(({ track }) => {
-            track(location, "params")
-            const id = +location.params.id;
-            return getStory(id)
-        });
+        const endpoint = useEndpoint<typeof onGet>();
+
         return (
             <Resource
-                value={resource}
+                value={endpoint}
                 onPending={() => <div class="news-list-nav">Loading...</div>}
                 onResolved={(story) => {
                     return <div class="item-view">
