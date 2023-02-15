@@ -1,19 +1,19 @@
-import { component$, useStore, Slot } from '@builder.io/qwik';
+import { component$, useStore, Slot, useSignal } from '@builder.io/qwik';
 
 export default component$(() => {
-  const state = useStore({ open: true });
-  return (
-    <>
-      <div class={state.open ? "toggle open" : "toggle"}>
-        <a onClick$={() => (state.open = !state.open)}>
-          {state.open ? "[-]" : "[+] collapsed"}
-        </a>
-      </div>
-      {state.open && (
-        <ul class="comment-children">
-          <Slot />
-        </ul>
-      )}
-    </>
-  );
+    const open = useSignal(true);
+    return (
+        <>
+            <div class={{ "toggle": true, "open": open.value }}>
+                <a onClick$={() => open.value = !open.value}>
+                    {open.value ? "[-]" : "[+] collapsed"}
+                </a>
+            </div>
+            {open.value && (
+                <ul class="comment-children">
+                    <Slot />
+                </ul>
+            )}
+        </>
+    );
 });
